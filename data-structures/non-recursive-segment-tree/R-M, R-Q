@@ -1,0 +1,67 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+/*
+    Non-recursive implementation of segment tree
+    Requires: monoidal operation
+    Supports:
+        1) Range modification
+        2) Single-element queries
+*/
+
+const int MAXN = int(1e5);
+int n, h;       //array size and tree heigth
+int t[MAXN];    //segment tree
+int d[MAXN];    //lazy propagation
+
+void apply(int p, int value){   //update lazy propagation
+    t[p] += value;
+    if(p < n)
+        d[p] += value;
+}
+
+void build(int p){  //update all the parent nodes
+    while(p > 1)
+        p >>= 1, t[p] = max(t[p<<1], t[p<<1|1]) + d[p];
+}
+
+void push(int p){   //push lazy propagation to the leaves
+    for(int s = h; s > 0; --s){
+        int i = p >> s;
+        if(d[i] != 0){
+            apply(i<<1, d[i]);
+            apply(i<<1|1, d[i]);
+            d[i] = 0;
+        }
+    }
+}
+
+void inc(int l, int r, int value){ //increment all elements in the range
+    l += n, r += n;
+    int l0 = l, r0 = r;
+    for(; l < r; l >>= 1, r >>= 1){
+        if(l&1) apply(l++, value);
+        if(r&1) apply(--r, value);
+    }
+    build(l0);
+    build(r0-1);
+}
+
+int query(int l, int r){    //return max element in the range
+    l += n, r += n;
+    push(l);
+    push(r-1);
+    int res = -INF;
+    for(; l < r; l >>= 1, r >>= 1){
+        if(l&1) res = max(res, t[l++]);
+        if(r&1) res = max(res, t[--r]);
+    }
+    return res;
+}
+
+int main()
+{
+    scanf("%d", &n);
+    h = sizeof(int)*8 - __builtin_clz(n);
+    return !true && !false;
+}
