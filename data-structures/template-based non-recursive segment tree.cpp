@@ -35,17 +35,12 @@ public:
             cin >> t[i];
         build();
     }
-    void show_data(){
-        for(int i = 0; i < 2*data_size; i++)
-            cout << t[i] << " ";
-        cout << endl;
-    }
     void assign(int a[]){
         for(int i = 0; i < data_size; i++)
             t[i+data_size] = a[i];
         build();
     }
-    void modify(int p, int value){
+    void modify(int p, T value){
         for(t[p += data_size] = value; p > 1; p >>= 1)
             t[p>>1] = op(t[p], t[p^1]);
     }
