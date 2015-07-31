@@ -13,6 +13,7 @@ void modify(int p, int value){  //single-element modification
     for(t[p += n] = value; p > 1; p >>= 1) t[p>>1] = t[p] + t[p^1];
 }
 
+//important note: query(l, r) ~ query [l, r) (in mathematical notation)
 int query(int l, int r){    //sum range-query, though supports any commutative monoidal operation
     int res = 0;
     for(l += n, r += n; l < r; l >>= 1, r >>= 1){
