@@ -61,9 +61,6 @@ public:
 
 int main()
 {
-//    ios::sync_with_stdio(false);
-//    freopen("in", "r", stdin);
-//    freopen("out", "w", stdout);
     int n; scanf("%d", &n);
     segment_tree<double> t(n, [&](double a, double b){return a*b;}, 1.);
     t.read_data();
