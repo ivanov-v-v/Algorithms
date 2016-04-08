@@ -1,6 +1,9 @@
 #define _CRT_DISABLE_PERFCRIT_LOCKS
 #define _ CRT_SECURE_NO_WARNINGS
 //#define _USE_MATH_DEFINES
+//#define CUSTOM_VECTOR
+#define CUSTOM_ALLOCATOR
+#define DEBUG
 
 #include <bits/stdc++.h>
 using namespace std;
@@ -231,7 +234,20 @@ inline std::ostream& operator << (std::ostream& os, const triple<T1, T2, T3>& t)
 //    }
 //}
 
-//#define DEBUG
+#ifdef CUSTOM_VECTOR
+template <class T>
+    struct custom_vector : vector<T> {
+    custom_vector() : vector<T>() { }
+    custom_vector( int n ) : vector<T>(n) { }
+    custom_vector( int n, T x ) : vector<T>(n, x) { }
+    T &operator [] ( size_t i ) {
+        return vector<T>::at(i);
+    }
+};
+
+#define vector custom_vector
+#endif
+
 
 template<typename T>
 class max_flow {
@@ -321,6 +337,20 @@ int main(){
         fastIO();
 //        freopen("in", "r", stdin);
 //        freopen("out", "w", stdout);
+
     print((new max_flow<ll>)->process());
     return 0;
 }
+
+#ifdef CUSTOM_ALLOCATOR
+const int MAX_MEM = 1e8;
+int mpos = 0;
+char mem[MAX_MEM];
+inline void * operator new ( size_t n ) {
+    char *res = mem + mpos;
+    mpos += n;
+    assert(mpos <= MAX_MEM);
+    return (void *) res;
+}
+inline void operator delete ( void * ) { }
+#endif // CUSTOM_ALLOCATOR
