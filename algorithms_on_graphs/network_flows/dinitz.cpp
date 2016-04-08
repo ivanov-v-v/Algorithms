@@ -1,9 +1,22 @@
 #define _CRT_DISABLE_PERFCRIT_LOCKS
 #define _ CRT_SECURE_NO_WARNINGS
 //#define _USE_MATH_DEFINES
+
+/*Allocation control*/
 //#define CUSTOM_VECTOR
 #define CUSTOM_ALLOCATOR
+
+/*Hidden features*/
+//#define BUILTIN_TREE
+//#define BINARY_IO
+//#define INT_128
+
 #define DEBUG
+
+#ifdef BUILTIN_TREE
+    #include <ext/pb_ds/assoc_container.hpp>
+    using namespace __gnu_pbds;
+#endif
 
 #include <bits/stdc++.h>
 using namespace std;
@@ -116,28 +129,29 @@ template <typename T, size_t N> struct MakeTensor{ template <typename... Args> s
 template <typename T> struct MakeTensor<T, 1> { static vector<T> tensor(size_t size) { return vector<T>(size); }};
 template <typename T, typename... Args> auto tensor(Args... args) -> decltype(MakeTensor<T, sizeof...(Args)>::tensor(args...)){ return MakeTensor<T, sizeof...(Args)>::tensor(args...); }
 
-//__int128 -- use if supported
-//typedef __int128 bigInt;
-//istream& operator >>(istream& in, bigInt& n){
-//    in >> ws; n = 0;
-//    for(char ch = getchar(); isdigit(ch); ch = getchar()){
-//        n = n*bigInt(10) + bigInt(ch-'0');
-//    }
-//    return in;
-//}
-//ostream& operator <<(ostream& out, bigInt n){
-//    int digits[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-//    int representation[36];
-//    int pos = 0;
-//    while(n){
-//        representation[pos++] = digits[n % 10];
-//        n /= 10;
-//    }
-//    for(int i = pos-1; i >= 0; i--){
-//        out << representation[i];
-//    }
-//    return out;
-//}
+#ifdef INT_128
+typedef __int128 bigInt;
+istream& operator >>(istream& in, bigInt& n){
+    in >> ws; n = 0;
+    for(char ch = getchar(); isdigit(ch); ch = getchar()){
+        n = n*bigInt(10) + bigInt(ch-'0');
+    }
+    return in;
+}
+ostream& operator <<(ostream& out, bigInt n){
+    int digits[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    int representation[36];
+    int pos = 0;
+    while(n){
+        representation[pos++] = digits[n % 10];
+        n /= 10;
+    }
+    for(int i = pos-1; i >= 0; i--){
+        out << representation[i];
+    }
+    return out;
+}
+#endif // INT_128
 
 //DEBUG
 #define VA_NUM_ARGS(...) VA_NUM_ARGS_IMPL_((0,__VA_ARGS__, 5,4,3,2,1))
@@ -163,76 +177,77 @@ bool operator<(const triple<T1, T2, T3> &t1, const triple<T1, T2, T3> &t2){ if (
 template<typename T1, typename T2, typename T3>
 inline std::ostream& operator << (std::ostream& os, const triple<T1, T2, T3>& t){ return os << "(" << t.a << ", " << t.b << ", " << t.c << ")"; }
 
-//EXTREMELY FAST I/O
-//const int BUSFIZE = 2048;
-//static char inbuf[BUSFIZE + 16];
-//static char *inp = inbuf;
-//static char *linp = inbuf + BUSFIZE;
-//int read_int()
-//{
-//    if (*inp && (*inp < '0' || *inp > '9') && *inp != '-') ++inp;
-//    if (*inp == 0)
-//    {
-//        memset(inbuf, 0, BUSFIZE);
-//        cin.read(inbuf, BUSFIZE);
-//        inp = inbuf;
-//    }
-//    while (*inp && (*inp < '0' || *inp > '9') && *inp != '-') ++inp;
-//    bool minus = false;
-//    if (*inp == '-') minus = true, ++inp;
-//    if (*inp == 0)
-//    {
-//        memset(inbuf, 0, BUSFIZE);
-//        cin.read(inbuf, BUSFIZE);
-//        inp = inbuf;
-//    }
-//    int res = *inp++ - '0';
-//    if (inp == linp)
-//    {
-//        memset(inbuf, 0, BUSFIZE);
-//        cin.read(inbuf, BUSFIZE);
-//        inp = inbuf;
-//    }
-//    while (*inp >= '0' && *inp <= '9')
-//    {
-//        res = res * 10 + *inp - '0';
-//        ++inp;
-//        if (inp == linp)
-//        {
-//            memset(inbuf, 0, BUSFIZE);
-//            cin.read(inbuf, BUSFIZE);
-//            inp = inbuf;
-//        }
-//    }
-//    return minus ? -res : res;
-//}
-//static char outbuf[BUSFIZE + 16];
-//static char *outp = outbuf;
-//static char *loutp = outbuf + BUSFIZE;
-//void write_int(int x, bool last = false)
-//{
-//    char *begp = outp;
-//    do
-//    {
-//        int t = x / 10;
-//        char c = x - 10 * t + '0';
-//        *outp++ = c;
-//        x = t;
-//    } while (x);
-//    char *endp = outp - 1;
-//    while (begp < endp)
-//    {
-//        swap(*begp, *endp);
-//        ++begp;
-//        --endp;
-//    }
-//    *outp++ = '\n';
-//    if (last || outp > loutp)
-//    {
-//        cout.write(outbuf, outp - outbuf);
-//       outp = outbuf;
-//    }
-//}
+#ifdef BINARY_IO
+const int BUSFIZE = 2048;
+static char inbuf[BUSFIZE + 16];
+static char *inp = inbuf;
+static char *linp = inbuf + BUSFIZE;
+int read_int()
+{
+    if (*inp && (*inp < '0' || *inp > '9') && *inp != '-') ++inp;
+    if (*inp == 0)
+    {
+        memset(inbuf, 0, BUSFIZE);
+        cin.read(inbuf, BUSFIZE);
+        inp = inbuf;
+    }
+    while (*inp && (*inp < '0' || *inp > '9') && *inp != '-') ++inp;
+    bool minus = false;
+    if (*inp == '-') minus = true, ++inp;
+    if (*inp == 0)
+    {
+        memset(inbuf, 0, BUSFIZE);
+        cin.read(inbuf, BUSFIZE);
+        inp = inbuf;
+    }
+    int res = *inp++ - '0';
+    if (inp == linp)
+    {
+        memset(inbuf, 0, BUSFIZE);
+        cin.read(inbuf, BUSFIZE);
+        inp = inbuf;
+    }
+    while (*inp >= '0' && *inp <= '9')
+    {
+        res = res * 10 + *inp - '0';
+        ++inp;
+        if (inp == linp)
+        {
+            memset(inbuf, 0, BUSFIZE);
+            cin.read(inbuf, BUSFIZE);
+            inp = inbuf;
+        }
+    }
+    return minus ? -res : res;
+}
+static char outbuf[BUSFIZE + 16];
+static char *outp = outbuf;
+static char *loutp = outbuf + BUSFIZE;
+void write_int(int x, bool last = false)
+{
+    char *begp = outp;
+    do
+    {
+        int t = x / 10;
+        char c = x - 10 * t + '0';
+        *outp++ = c;
+        x = t;
+    } while (x);
+    char *endp = outp - 1;
+    while (begp < endp)
+    {
+        swap(*begp, *endp);
+        ++begp;
+        --endp;
+    }
+    *outp++ = '\n';
+    if (last || outp > loutp)
+    {
+        cout.write(outbuf, outp - outbuf);
+       outp = outbuf;
+    }
+}
+#endif
 
 #ifdef CUSTOM_VECTOR
 template <class T>
@@ -248,19 +263,27 @@ template <class T>
 #define vector custom_vector
 #endif
 
+template<typename T>
+class edge{
+public:
+    int from, to;
+    int next;
+    T f, c;
+    friend ostream& operator <<(ostream&, const edge&);
+};
+
+template<typename T>
+ostream& operator<<(ostream& out, const edge<T> &e) {
+    out << "[" << e.from << " -> " << e.to << ", " << e.f << "\\" << e.c << "]";
+    return out;
+}
 
 template<typename T>
 class max_flow {
 
-    struct edge{
-        int from, to;
-        int next;
-        T f, c;
-    };
-
     int n, m;
     int s, t;
-    vector<edge> edges;
+    vector<edge<T>> edges;
     vector<int> head;
 
     void add_edge(int a, int b, T c) {
@@ -273,14 +296,15 @@ class max_flow {
     void read_network() {
         read(n, m);
         s = 0, t = n-1;
-        head = vector<int>(n, -1);
+        head = vector<int>(t+1, -1);
         edges.reserve(2*m);
         in_range(i, 0, m) {
-            int a, b, c;
+            int a, b; T c;
             read(a, b, c), a--, b--;
             add_edge(a, b, c);
             add_edge(b, a, c);
         }
+        n = t+1;
         m = sz(edges);
     }
 
@@ -294,7 +318,7 @@ class max_flow {
         while (qh < qt) {
             int v = q[qh++];
             for (int i = head[v]; i != -1; i = edges[i].next) {
-                edge &e = edges[i];
+                edge<T> &e = edges[i];
                 if (e.f < e.c && d[e.to] > d[v]+1) {
                     d[e.to] = d[v]+1;
                     q[qt++] = e.to;
@@ -308,7 +332,7 @@ class max_flow {
     T push(int v, T f) {
         if (v == t || !f) return f;
         for (int &i = ptr[v]; i != -1; i = edges[i].next) {
-            edge &e = edges[i];
+            edge<T> &e = edges[i];
             if (d[e.to] != d[v]+1) continue;
             if (int pushed = push(e.to, min(f, e.c-e.f))) {
                 e.f += pushed, edges[i^1].f -= pushed;
@@ -337,7 +361,6 @@ int main(){
         fastIO();
 //        freopen("in", "r", stdin);
 //        freopen("out", "w", stdout);
-
     print((new max_flow<ll>)->process());
     return 0;
 }
