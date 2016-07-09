@@ -50,7 +50,7 @@ void find_bridges(int v, int p = -1) {
 
 int main(){
 //    fastIO();
-    freopen("in", "r", stdin);
+//    freopen("in", "r", stdin);
 //    freopen("out", "w", stdout);
     int n, m;
     cin >> n >> m;
