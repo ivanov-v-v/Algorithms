@@ -47,12 +47,15 @@ public:
         t.resize(4*SIZE+1);
     }
     inline void build_tree(const vector<T>& a) {
+        assert(a.size() == MAXN);
         _build_tree(a, 1, 0, MAXN-1);
     }
     inline void update_position(int pos, const T& val) {
+        assert(0 <= pos && pos < MAXN);
         _update_position(1, 0, MAXN-1, pos, val);
     }
     inline T fold_range(int l, int r) const {
+        assert(0 <= l && l <= r && r < MAXN);
         return _fold_range(1, 0, MAXN-1, l, r);
     }
 };
