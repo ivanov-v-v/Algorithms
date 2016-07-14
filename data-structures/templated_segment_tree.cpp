@@ -1,9 +1,9 @@
 template<typename T>
 class segment_tree {
 private:
-    const int MAXN;
-    const function<T(T, T)> op;
-    const T id;
+    int MAXN;
+    function<T(T, T)> op;
+    T id;
     vector<T> t;
 
     void _build_tree(const vector<T>& a, int v, int tl, int tr) {
@@ -40,7 +40,7 @@ private:
     }
 
 public:
-    segment_tree(const int SIZE, const function<T(T, T)> bin_op, T op_id) {
+    segment_tree(int SIZE, function<T(T, T)> bin_op, const T& op_id) {
         MAXN = SIZE;
         id = op_id;
         op = bin_op;
