@@ -5,7 +5,7 @@
 - Algo: 
 -- Complexity: O(n)
 -- Idea:       As there are O(n^2) contiguous subsegments,
---             naive solution would have O(N^2 * QUERY) time.
+--             naive solution would have O(N^2 * QUERY) time,
 --             where QUERY can be reduced to O(1) by sparse table.
 --             Therefore, we can invert the process of thought:
 --             instead of traversing all subsegments, we can
@@ -19,12 +19,6 @@
 --             Hint: as we only need to know first of such indices for every i,
 --             total complexity must not exceed O(n), as every index will be
 --             removed after its answer is calculated.
---             As left[i] and right[i] lie on prefix or suffix of our array
---             we can pre-calculate the array of prefix(suffix-)-min and
---             find both left[i] and right[i] using binary search (as they are monotone).
---             Therefore, so far we have reduced the complexity to O(nlogn).
---             Can we do better? 
---             The answer is "Yes", and here is the way:
 --             Once again, invert the problem: if j is right[i] for some i < j, 
 --             how do we calculate i? First of all, right[i] must be uninitialized
 --             when we reach j-th position, and it suffies that a[i] >= a[j]. 
