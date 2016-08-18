@@ -1,7 +1,7 @@
 /*
 - Input: size n and an array of integers of that length
-- Goal:  for every subsegment [l;r] find its minimal element
--        and output their sum.
+- Goal:  for every subsegment [l;r] find its minimal/maximal element
+-        and output their sum (can be generalized to any linear ordering).
 - Algo: 
 -- Complexity: O(n)
 -- Idea:       As there are O(n^2) contiguous subsegments,
