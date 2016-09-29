@@ -7,7 +7,8 @@ class order_stats {
 private:
     T* a;
     unsigned n;
-
+    // sorting the groups of length <= K
+    // and extracting medians out of them
     unsigned partitionK_(unsigned l, unsigned r) {
         for (size_t i = l; i < r; ++i) {
             for (size_t j = i; j > 0 && a[j - 1] > a[j] ; --j) {
@@ -16,6 +17,7 @@ private:
         }
         return r - l <= 2 ? l : l + (r - l)/2 - 1;
     }
+    // check pivot using "medians of medians" approach
     unsigned pivot_(unsigned l, unsigned r) {
         if (r - l <= K) {
             return partitionK_(l, r);
@@ -24,8 +26,9 @@ private:
             unsigned median5 = partitionK_(i, std::min(r, i + K - 1));
             std::swap(a[median5], a[l + (i - l)/K]);
         }
-        return select_(l, l + std::ceil(static_cast<double>(r - l)/K) - 1, l + (r - l)/(2*K));
+        return select_(l, l + std::ceil((r - l)/(K*1.)) - 1, l + (r - l)/(2*K));
     }
+    // partition an array around a pivot
     unsigned partition_(unsigned l, unsigned r, unsigned pivotId) {
         unsigned j = l;
         T &pivot = a[r - 1];
@@ -39,6 +42,7 @@ private:
         std::swap(a[j], pivot);
         return j;
     }
+    // get position of order-th element
     unsigned select_(unsigned l, unsigned r, unsigned order) {
         while (r - l >= 2) {
             unsigned pivotId = pivot_(l, r);
