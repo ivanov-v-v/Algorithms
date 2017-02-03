@@ -24,7 +24,7 @@ pnode meld(pnode& L, pnode& R) {
         swap(L, R);
     }
     L->tr = meld(L->tr, R);
-    if (getRank(L->tl) < getRank(R->tr)) {
+    if (getRank(L->tl) < getRank(L->tr)) {
         swap(L->tl, L->tr);
     }
     L->pr = nullptr;
