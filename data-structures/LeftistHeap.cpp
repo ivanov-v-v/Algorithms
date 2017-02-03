@@ -1,12 +1,3 @@
-struct LeftistNode {
-    int key;
-    unsigned rank;
-    LeftistNode *tl, *tr, *pr;
-    LeftistNode(int K): key(K), rank(1) {
-        tl = tr = pr = nullptr;
-    }
-};
-
 typedef LeftistNode* pnode;
 unsigned getRank(pnode T) {
     return T ? T->rank : 0;
@@ -24,10 +15,12 @@ pnode merge(pnode& L, pnode& R) {
         swap(L, R);
     }
     L->tr = merge(L->tr, R);
-    if (getRank(L) < getRank(R)) {
-        swap(L, R);
+    if (getRank(L->tl) < getRank(R->tr)) {
+        swap(L->tl, L->tr);
     }
-    R->pr = L, L->pr = nullptr;
+    L->pr = nullptr;
+    if (L->tl) { L->tl->pr = L; }
+    if (L->tr) { L->tr->pr = L; }
     update(L);
     return L;
 }
@@ -35,7 +28,6 @@ pnode merge(pnode& L, pnode& R) {
 void insert(pnode& root, const int& key) {
     pnode T0 = new LeftistNode(key);
     root = merge(root, T0);
-//    cout << root->key << endl;
 }
 int getMin(pnode root) {
     if (!getRank(root)) {
@@ -51,12 +43,26 @@ int extractMin(pnode& root) {
     root = merge(root->tl, root->tr);
     return result;
 }
-void deleteNode(pnode node) {
+void deleteNode(pnode& node) {
     pnode backLink = node->pr;
     node = merge(node->tl, node->tr);
     node->pr = backLink;
-    while (node->pr) {
-        node->pr->rank = min(getRank(node->pr->tl), getRank(node->pr->tr)) + 1;
+    pnode currNode = node;
+    while (currNode->pr) {
+        update(currNode->pr);
+        currNode = currNode->pr;
+    }
+}
+void decreaseKey(pnode node, int delta) {
+    if (delta <= 0) {
+        return;
+    }
+    node->key -= delta;
+    while (node->pr && node->key < node->pr->key) {
+        swap(node->key, node->pr->key);
         node = node->pr;
     }
+}
+bool empty(pnode T) {
+    return !getRank(T);
 }
