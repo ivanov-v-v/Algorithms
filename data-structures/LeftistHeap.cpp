@@ -1,20 +1,29 @@
+struct LeftistNode {
+    int key;
+    unsigned rank;
+    LeftistNode *tl, *tr, *pr;
+    LeftistNode(int K): key(K), rank(1) {
+        tl = tr = pr = nullptr;
+    }
+};
+
 typedef LeftistNode* pnode;
 unsigned getRank(pnode T) {
     return T ? T->rank : 0;
 }
 void update(pnode T) {
     if (!T) return;
-    T->rank = min(getRank(T->tl), getRank(T->tr)) + 1;
+    T->rank = getRank(T->tr) + 1;
 }
 
-pnode merge(pnode& L, pnode& R) {
+pnode meld(pnode& L, pnode& R) {
     if (!L || !R) {
         return L ? L : R;
     }
     if (L->key > R->key) {
         swap(L, R);
     }
-    L->tr = merge(L->tr, R);
+    L->tr = meld(L->tr, R);
     if (getRank(L->tl) < getRank(R->tr)) {
         swap(L->tl, L->tr);
     }
@@ -27,7 +36,7 @@ pnode merge(pnode& L, pnode& R) {
 
 void insert(pnode& root, const int& key) {
     pnode T0 = new LeftistNode(key);
-    root = merge(root, T0);
+    root = meld(root, T0);
 }
 int getMin(pnode root) {
     if (!getRank(root)) {
@@ -40,12 +49,12 @@ int extractMin(pnode& root) {
         throw logic_error("Empty heap");
     }
     int result = root->key;
-    root = merge(root->tl, root->tr);
+    root = meld(root->tl, root->tr);
     return result;
 }
 void deleteNode(pnode& node) {
     pnode backLink = node->pr;
-    node = merge(node->tl, node->tr);
+    node = meld(node->tl, node->tr);
     node->pr = backLink;
     pnode currNode = node;
     while (currNode->pr) {
