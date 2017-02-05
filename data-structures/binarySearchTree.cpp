@@ -131,6 +131,40 @@ public:
         root = erase(root, minVal);
         return minVal;
     }
+    T predecessor(const T& key) const {
+        Node *curr = root;
+        T prev = numeric_limits<T>::min();
+        while (curr && curr->value != key) {
+            if (key < curr->value) {
+                curr = curr->left;
+            } else {
+                prev = max(prev, curr->value);
+                curr = curr->right;
+            }
+        }
+        Node* subMax = findMaximum(curr->left);
+        if (subMax) {
+            prev = max(prev, subMax->value);
+        }
+        return prev;
+    }
+    T successor(const T& key) const {
+        Node *curr = root;
+        T next = numeric_limits<T>::max();
+        while (curr && curr->value != key) {
+            if (key < curr->value) {
+                next = min(next, curr->value);
+                curr = curr->left;
+            } else {
+                curr = curr->right;
+            }
+        }
+        Node* subMin = findMinimum(curr->right);
+        if (subMin) {
+            next = min(next, subMin->value);
+        }
+        return next;
+    }
     void inorderTraversal() const {
         inorderTraversal(root);
     }
