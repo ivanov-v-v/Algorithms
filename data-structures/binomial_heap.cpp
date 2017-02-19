@@ -1,3 +1,4 @@
+// NEEDS DEBUG
 template <typename T>
 struct Vertex {
     T key;
