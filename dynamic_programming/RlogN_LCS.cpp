@@ -1,4 +1,4 @@
-pair<int, vector<int>> naiveLCS(const vector<int>& v1, const vector<int>& v2) {
+pair<int, vector<int>> vanillaLCS(const vector<int>& v1, const vector<int>& v2) {
     if (v1.empty() || v2.empty()) {
         return {0, vector<int>()};
     }
@@ -49,34 +49,76 @@ pair<int, vector<int>> naiveLCS(const vector<int>& v1, const vector<int>& v2) {
     return {dp[n - 1][m - 1], common};
 }
 
-pair<int, vector<int>> allDistinctElementsLCS(const vector<int>& v1, const vector<int>& v2) {
+// R = sum of occurences of elements from one string in another, R <= N * M
+// for random data, the classical algorithm shows better performance due to
+// the overhead of data structures used in input-sensitive algorithm
+pair<int, vector<int>> RLogNLCS(const vector<int>& v1, const vector<int>& v2) {
     const vector<int>& A = v1.size() < v2.size() ? v2 : v1;
     const vector<int>& B = v1.size() < v2.size() ? v1 : v2;
 
     int n = v1.size(), m = v2.size();
-    map<int, int> pos;
-    for (size_t i = 0; i < n; ++i) {
-        pos[A[i]] = i + 1;
+    map<int, std::list<int>> positions;
+    for (size_t i = 0; i < m; ++i) {
+        positions[B[i]].push_front(i);
     }
     vector<int> processedData;
-    for (size_t i = 0; i < m; ++i) {
-        int id = pos[B[i]];
-        processedData.push_back(id ? id - 1 : -1);
-    }
-    vector<int> dp(n + 1, numeric_limits<int>::max());
-    dp[0] = numeric_limits<int>::min();
-    for (size_t i = 0; i < m; ++i) {
-        if (processedData[i] == -1) {
+    for (size_t i = 0; i < n; ++i) {
+        if (positions[A[i]].empty()) {
             continue;
         }
+        auto id = positions[A[i]].begin();
+        while (id != positions[A[i]].end()) {
+            processedData.push_back(*id);
+            ++id;
+        }
+    }
+
+    int r = processedData.size();
+    vector<int> dp(r + 1, numeric_limits<int>::max());
+    dp[0] = numeric_limits<int>::min();
+    for (size_t i = 0; i < r; ++i) {
         auto replaceableIt = upper_bound(dp.begin(), dp.end(), processedData[i]);
         if (replaceableIt != dp.end()) {
             *replaceableIt = processedData[i];
         }
     }
     vector<int> lcs;
-    for (size_t i = 1; i <= n && dp[i] != numeric_limits<int>::max(); ++i) {
-        lcs.push_back(A[dp[i]]);
+    for (size_t i = 1; i <= r && dp[i] != numeric_limits<int>::max(); ++i) {
+        lcs.push_back(B[dp[i]]);
     }
     return {lcs.size(), lcs};
+}
+
+template<class T> ostream& operator <<(ostream& os, const vector<T>& Col) {
+    for(auto &el : Col) {
+        os << el << " ";
+    }
+    return os;
+}
+
+int main() {
+    srand(time(0));
+    int n, m;
+    cin >> n >> m;
+    char mode = 'y';
+    while (mode == 'y') {
+        vector<int> v1, v2;
+        while (v1.size() != n) {
+            v1.push_back(rand() % 100);
+        }
+        while (v2.size() != m) {
+            v2.push_back(rand() % 100);
+        }
+        auto answ1 = vanillaLCS(v1, v2);
+        auto answ2 = RLogNLCS(v1, v2);
+        cout << answ1.first <<  " " << answ2.first << ": ";
+        if (answ1.first != answ2.first) {
+            cout << answ1.second << "\n"
+                 << answ2.second << "\n"
+                 << v1 << "\n"
+                 << v2 << "\n";
+        } cout << "\n";
+        cin >> mode;
+    }
+    return 0;
 }
