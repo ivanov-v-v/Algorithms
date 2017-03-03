@@ -1,3 +1,14 @@
+#include <iostream>
+#include <algorithm>
+#include <climits>
+#include <utility>
+#include <vector>
+#include <list>
+#include <map>
+
+using std::pair;
+using std::vector;
+
 pair<int, vector<int>> vanillaLCS(const vector<int>& v1, const vector<int>& v2) {
     if (v1.empty() || v2.empty()) {
         return {0, vector<int>()};
@@ -7,11 +18,11 @@ pair<int, vector<int>> vanillaLCS(const vector<int>& v1, const vector<int>& v2) 
     vector<vector<pair<int, int>>> prev(n, vector<pair<int, int>>(m));
     dp[0][0] = v1[0] == v2[0];
     for (size_t i = 1; i < n; ++i) {
-        dp[i][0] = max(dp[i - 1][0], int(v1[i] == v2[0]));
+        dp[i][0] = std::max(dp[i - 1][0], int(v1[i] == v2[0]));
         prev[i][0] = {i - 1, 0};
     }
     for (size_t j = 1; j < m; ++j) {
-        dp[0][j] = max(dp[0][j - 1], int(v1[0] == v2[j]));
+        dp[0][j] = std::max(dp[0][j - 1], int(v1[0] == v2[j]));
         prev[0][j] = {0, j - 1};
     }
     for (size_t i = 1; i < n; ++i) {
@@ -33,10 +44,10 @@ pair<int, vector<int>> vanillaLCS(const vector<int>& v1, const vector<int>& v2) 
     vector<int> common;
     int i = n - 1, j = m - 1;
     while (i && j) {
-        if (prev[i][j] == make_pair(i - 1, j - 1)) {
+        if (prev[i][j] == std::make_pair(i - 1, j - 1)) {
             common.push_back(v1[i]);
             --i, --j;
-        } else if (prev[i][j] == make_pair(i - 1, j)) {
+        } else if (prev[i][j] == std::make_pair(i - 1, j)) {
             --i;
         } else  {
             --j;
@@ -45,7 +56,7 @@ pair<int, vector<int>> vanillaLCS(const vector<int>& v1, const vector<int>& v2) 
     if (v1[i] == v2[j]) {
         common.push_back(v1[i]);
     }
-    reverse(common.begin(), common.end());
+    std::reverse(common.begin(), common.end());
     return {dp[n - 1][m - 1], common};
 }
 
@@ -57,10 +68,13 @@ pair<int, vector<int>> RLogNLCS(const vector<int>& v1, const vector<int>& v2) {
     const vector<int>& B = v1.size() < v2.size() ? v1 : v2;
 
     int n = v1.size(), m = v2.size();
-    map<int, std::list<int>> positions;
+    std::map<int, std::list<int>> positions;
     for (size_t i = 0; i < m; ++i) {
         positions[B[i]].push_front(i);
     }
+    // find posiions of each occurence of elements from A in B
+    // sort them in descending order, and replace each element
+    // with elements from its list
     vector<int> processedData;
     for (size_t i = 0; i < n; ++i) {
         if (positions[A[i]].empty()) {
@@ -72,10 +86,16 @@ pair<int, vector<int>> RLogNLCS(const vector<int>& v1, const vector<int>& v2) {
             ++id;
         }
     }
-
+    // observe that LCS is now reduced to LIS, which can be solved in O(r log n)
+    // as what matters is the relative ordering of elements
+    // of one array in another, that's why it's enough
+    // to subsitute elements with their indices
+    // the lists of them must be sorted, because otherwise
+    // it will be impossible to include all the consequtive
+    // occurences of the same element in the data, if necessary
     int r = processedData.size();
-    vector<int> dp(r + 1, numeric_limits<int>::max());
-    dp[0] = numeric_limits<int>::min();
+    vector<int> dp(n + 1, std::numeric_limits<int>::max());
+    dp[0] = std::numeric_limits<int>::min();
     for (size_t i = 0; i < r; ++i) {
         auto replaceableIt = upper_bound(dp.begin(), dp.end(), processedData[i]);
         if (replaceableIt != dp.end()) {
@@ -83,13 +103,13 @@ pair<int, vector<int>> RLogNLCS(const vector<int>& v1, const vector<int>& v2) {
         }
     }
     vector<int> lcs;
-    for (size_t i = 1; i <= r && dp[i] != numeric_limits<int>::max(); ++i) {
+    for (size_t i = 1; i <= n && dp[i] != std::numeric_limits<int>::max(); ++i) {
         lcs.push_back(B[dp[i]]);
     }
     return {lcs.size(), lcs};
 }
 
-template<class T> ostream& operator <<(ostream& os, const vector<T>& Col) {
+template<class T> std::ostream& operator <<(std::ostream& os, const vector<T>& Col) {
     for(auto &el : Col) {
         os << el << " ";
     }
@@ -99,7 +119,7 @@ template<class T> ostream& operator <<(ostream& os, const vector<T>& Col) {
 int main() {
     srand(time(0));
     int n, m;
-    cin >> n >> m;
+    std::cin >> n >> m;
     char mode = 'y';
     while (mode == 'y') {
         vector<int> v1, v2;
@@ -111,14 +131,14 @@ int main() {
         }
         auto answ1 = vanillaLCS(v1, v2);
         auto answ2 = RLogNLCS(v1, v2);
-        cout << answ1.first <<  " " << answ2.first << ": ";
+        std::cout << answ1.first <<  " " << answ2.first << ": ";
         if (answ1.first != answ2.first) {
-            cout << answ1.second << "\n"
-                 << answ2.second << "\n"
-                 << v1 << "\n"
-                 << v2 << "\n";
-        } cout << "\n";
-        cin >> mode;
+            std::cout << answ1.second << "\n"
+                      << answ2.second << "\n"
+                      << v1 << "\n"
+                      << v2 << "\n";
+        } std::cout << "\n";
+        std::cin >> mode;
     }
     return 0;
 }
