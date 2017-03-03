@@ -97,7 +97,7 @@ pair<int, vector<int>> RLogNLCS(const vector<int>& v1, const vector<int>& v2) {
     vector<int> dp(n + 1, std::numeric_limits<int>::max());
     dp[0] = std::numeric_limits<int>::min();
     for (size_t i = 0; i < r; ++i) {
-        auto replaceableIt = upper_bound(dp.begin(), dp.end(), processedData[i]);
+        auto replaceableIt = std::upper_bound(dp.begin(), dp.end(), processedData[i]);
         if (replaceableIt != dp.end()) {
             *replaceableIt = processedData[i];
         }
