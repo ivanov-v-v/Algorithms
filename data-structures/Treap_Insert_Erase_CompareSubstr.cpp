@@ -265,7 +265,7 @@ inline void upd(pnode T) {
 
 pnode Merge(pnode& L, pnode& R) {
     if (!L || !R) { return L ? L : R; }
-    bool LIsRoot = L->cnt%(L->cnt+R->cnt+1) > R->cnt;
+    bool LIsRoot = rand()%(L->cnt+R->cnt+1) > R->cnt;
     if (LIsRoot) {
         L->tr = Merge(L->tr, R);
         upd(L); return L;
