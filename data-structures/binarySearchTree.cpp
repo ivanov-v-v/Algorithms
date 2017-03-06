@@ -1,6 +1,6 @@
 template <typename T>
 class BST {
-public:
+private:
     struct Node {
         T value;
         Node *left, *right, *parent;
@@ -72,8 +72,14 @@ public:
         }
         if (key < root->value) {
             root->left = erase(root->left, key);
+            if (root->left) {
+                root->left->parent = root;
+            }
         } else if (key > root->value) {
             root->right = erase(root->right, key);
+            if (root->right) {
+                root->right->parent = root;
+            }
         } else {
             if (!root->left && !root->right) {
                 delete root;
