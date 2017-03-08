@@ -1,2 +1,2 @@
-# algos
-algorithms and data structures (for ACM ICPC), implemented in C++
+# Algorithms
+Algorithms and data structures heavily used in programming competitions, implemented in C++.
