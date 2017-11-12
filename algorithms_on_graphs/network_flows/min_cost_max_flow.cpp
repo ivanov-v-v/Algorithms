@@ -44,11 +44,56 @@ class min_cost_max_flow {
     }
 
     vector<C> d;
-    vector<int> state, pr;
+    vector<int> pr;
+
+    vector<C> potential;
+    bool dijkstra () {
+        priority_queue<pii, vector<pii>, greater<pii>> pq;
+        fill(all(d), numeric_limits<C>::max());
+
+        d[s] = 0;
+        pq.push(make_pair(d[s], s));
+        while (!pq.empty()) {
+            int u = pq.top().second;
+            int cdist = pq.top().first;
+            pq.pop();
+            if (cdist != d[u]) {
+                continue;
+            }
+            for (int i = head[u]; i != -1; i = edges[i].next) {
+                auto& e = edges[i];
+                int v = e.to;
+                if (e.f == e.c) {
+                    continue;
+                }
+                int weight = e.cost + potential[u] - potential[v];
+                int ndist = weight + d[u];
+                if (ndist >= d[v]) {
+                    continue;
+                }
+                d[v] = ndist;
+                pr[v] = i;
+                pq.push(make_pair(d[v], v));
+            }
+        }
+        if (d[t] == numeric_limits<C>::max()) {
+            return false;
+        }
+        for (int i = 0; i < n; ++i) {
+            if (d[i] == numeric_limits<C>::max()) {
+                continue;
+            }
+            potential[i] += d[i];
+        }
+        return true;
+    }
+
+    vector<int> state;
     deque<int> q;
     bool levite() {
         fill(all(d), numeric_limits<C>::max());
         fill(all(state), 2);
+//        fill(all(pr), -1);
 
         d[s] = 0;
         q.push_front(s);
@@ -58,9 +103,9 @@ class min_cost_max_flow {
             state[v] = 0;
             for (int i = head[v]; i != -1; i = edges[i].next) {
                 edge<T, C> &e = edges[i];
-                if (e.f >= e.c) continue;
-                if (d[e.to] > d[v]+e.cost) {
-                    d[e.to] = d[v]+e.cost;
+                if (e.f >= e.c || e.used) continue;
+                if (d[e.to] > d[v] + e.cost) {
+                    d[e.to] = d[v] + e.cost;
                     if (state[e.to] == 0) { q.push_front(e.to); }
                     if (state[e.to] == 2) { q.push_back(e.to); }
                     state[e.to] = 1;
