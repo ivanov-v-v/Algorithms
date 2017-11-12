@@ -32,8 +32,8 @@ class min_cost_max_flow {
 
     void read_network() {
         read(n, m);
-        s = 0, t = n+1;
-        head = vector<int>(t+1, -1);
+        s = 0, t = n + 1;
+        head = vector<int>(t + 1, -1);
         in_range(i, 0, m) {
             int a, b; T c; C cost;
             read(a, b, c, cost);
@@ -49,7 +49,6 @@ class min_cost_max_flow {
     bool levite() {
         fill(all(d), numeric_limits<C>::max());
         fill(all(state), 2);
-        fill(all(pr), -1);
 
         d[s] = 0;
         q.push_front(s);
@@ -76,7 +75,7 @@ class min_cost_max_flow {
         for (int v = t; pr[v] != -1; v = edges[pr[v]].from) {
             f = min(f, edges[pr[v]].c - edges[pr[v]].f);
         }
-        for (int v = t; pr[v] != -1; v = edges[pr[v]].from) {
+        for (int v = t; v != s; v = edges[pr[v]].from) {
             edges[pr[v]].f += f;
             edges[pr[v]^1].f -= f;
         }
