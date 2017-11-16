@@ -93,7 +93,7 @@ class min_cost_max_flow {
     bool levite() {
         fill(all(d), numeric_limits<C>::max());
         fill(all(state), 2);
-//        fill(all(pr), -1);
+        fill(all(pr), -1);
 
         d[s] = 0;
         q.push_front(s);
@@ -103,7 +103,7 @@ class min_cost_max_flow {
             state[v] = 0;
             for (int i = head[v]; i != -1; i = edges[i].next) {
                 edge<T, C> &e = edges[i];
-                if (e.f >= e.c || e.used) continue;
+                if (e.f >= e.c) continue;
                 if (d[e.to] > d[v] + e.cost) {
                     d[e.to] = d[v] + e.cost;
                     if (state[e.to] == 0) { q.push_front(e.to); }
